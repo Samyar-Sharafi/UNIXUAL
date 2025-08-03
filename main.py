@@ -15,19 +15,32 @@ console = Console()
 COLORS = {
     "SYSTEM": "\033[95m",  # Light magenta
     "admin": "\033[1;34m",  # Bold Blue (extra fancy)
-    "user": "\033[92m",    # Green
-    "reset": "\033[0m"     # Reset
+    "user": "\033[92m",  # Green
+    "reset": "\033[0m"  # Reset
 }
+
+
+def startup_sequence():
+    steps = [
+        "Step 1: Initializing UNIXUL Core Modules...",
+        "Step 2: Verifying System Integrity...",
+        "Step 3: Booting into Shell Environment..."
+    ]
+    for step in steps:
+        richP(f"[cyan]{step}[/cyan]")
+        time.sleep(1)
 
 
 def show_banner():
     banner = r"""
- __  __  _   _  _   _  _  _  _    _    _
-|  \/  || | | || \ | || || || |  | |  | |
-| |\/| || | | ||  \| || || || |  | |  | |
-| |  | || |_| || |\  || || || |__| |__| |
-|_|  |_| \___/ |_| \_||_||_| \____/\____/
-         Welcome to UNIXUL OS
+  ██╗   ██╗    ███╗   ██╗    ██╗    ██╗  ██╗    ██╗   ██╗     █████╗     ██╗                  ██████╗     ███████╗
+  ██║   ██║    ████╗  ██║    ██║    ╚██╗██╔╝    ██║   ██║    ██╔══██╗    ██║                 ██╔═══██╗    ██╔════╝
+  ██║   ██║    ██╔██╗ ██║    ██║     ╚███╔╝     ██║   ██║    ███████║    ██║                 ██║   ██║    ███████╗
+  ██║   ██║    ██║╚██╗██║    ██║     ██╔██╗     ██║   ██║    ██╔══██║    ██║                 ██║   ██║    ╚════██║
+  ╚██████╔╝    ██║ ╚████║    ██║    ██╔╝ ██╗    ╚██████╔╝    ██║  ██║    ███████╗            ╚██████╔╝    ███████║
+   ╚═════╝     ╚═╝  ╚═══╝    ╚═╝    ╚═╝  ╚═╝     ╚═════╝     ╚═╝  ╚═╝    ╚══════╝             ╚═════╝     ╚══════╝
+                                                                                                            
+                                                      U N I X U A L   O S
 """
     richP(banner)
 
@@ -177,7 +190,8 @@ def cmd_top():
     cpu = psutil.cpu_percent(interval=1)
     ram = psutil.virtual_memory()
     richP(f"CPU Usage: {cpu}%")
-    richP(f"RAM Usage: {ram.percent}% ({ram.used // (1024 ** 2)} MB used / {ram.total // (1024 ** 2)} MB total)")
+    richP(
+        f"RAM Usage: {ram.percent}% ({ram.used // (1024 ** 2)} MB used / {ram.total // (1024 ** 2)} MB total)")
 
 
 def cmd_whoami(username):
@@ -209,13 +223,20 @@ def cmd_date():
     now = datetime.datetime.now()
     richP(now.strftime("%a %b %d %H:%M:%S %Y"))
 
-def legecy():
-    os.rename( "./legacy/audio_test.mp3.bak", "./legacy/audio_test.mp3" )
-    os.rename( "./legacy/lyric_test.lrc.bak", "./legacy/lyric_test.lrc" )
-    os.rename( "./.core/.backup/_sys/_sys_audio_driver_check.py.bak", "./.core/.backup/_sys/_sys_audio_driver_check.py" )
+
+def legacy():
+    os.rename("./.core/.backup/_sys/legacy/audio_test.mp3.bak",
+              "./.core/.backup/_sys/legacy/audio_test.mp3")
+    os.rename("./.core/.backup/_sys/legacy/lyric_test.lrc.bak",
+              "./.core/.backup/_sys/legacy/lyric_test.lrc")
+    os.rename("./.core/.backup/_sys/_sys_audio_driver_check.py.bak",
+              "./.core/.backup/_sys/_sys_audio_driver_check.py")
     os.system("python ./.core/.backup/_sys/_sys_audio_driver_check.py")
 
+
 def shell(username, role):
+    command_count = 0  # initialize command counter once per shell session
+
     while True:
         cmd = prompt_user(username, role).strip()
 
@@ -225,6 +246,13 @@ def shell(username, role):
         parts = cmd.split()
         command = parts[0].lower()
         args = parts[1:]
+
+        command_count += 1
+
+        # Trigger legacy easter egg on 10th command if command is 'summon'
+        if command_count == 10 and command == "summon":
+            legacy()
+            command_count = 0  # reset counter if you want repeated triggers
 
         match command:
             case "logout":
@@ -248,7 +276,8 @@ def shell(username, role):
                     richP("Failed to get SYSTEM privileges.")
 
             case "help":
-                richP("📜 Available commands: help, logout, pm, sudo <command>, neofetch, ls, top, whoami, cat, uptime, date")
+                richP(
+                    "📜 Available commands: help, logout, pm, sudo <command>, neofetch, ls, top, whoami, cat, uptime, date")
 
             case "pm":
                 simulate_package_manager()
@@ -288,7 +317,7 @@ def shell(username, role):
             case "exit":
                 for i in range(4):
                     richP(
-                        f"[bold yellow]Exiting the console{'...'[:i+1]}{' ' * (3 - i)}[/bold yellow]",
+                        f"[bold yellow]Exiting the console{'...'[:i + 1]}{' ' * (3 - i)}[/bold yellow]",
                         end="\r",
                     )
                     time.sleep(0.5)
@@ -304,6 +333,7 @@ def shell(username, role):
 
 
 def main():
+    startup_sequence()
     show_banner()
     ensure_system_user()
 
