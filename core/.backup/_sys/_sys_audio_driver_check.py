@@ -1,7 +1,6 @@
 import pygame
 import re
 
-
 def play_song_with_lyrics( mp3_path, lrc_path ) :
     pygame.init()
     pygame.mixer.init()
@@ -16,6 +15,7 @@ def play_song_with_lyrics( mp3_path, lrc_path ) :
                 seconds = float( match.group( 2 ) )
                 time_sec = minutes * 60 + seconds
                 lyrics.append( (time_sec, match.group( 3 )) )
+
     lyrics.sort()
 
     # Load and play music
@@ -35,6 +35,7 @@ def play_song_with_lyrics( mp3_path, lrc_path ) :
         while idx < len( lyrics ) and elapsed >= lyrics[ idx ][ 0 ] :
             print( lyrics[ idx ][ 1 ] )
             idx += 1
+
 
         # Check if music finished playing
         if not pygame.mixer.music.get_busy() :
